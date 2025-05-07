@@ -9,3 +9,6 @@ Is there a way to ensure that we always get an empty class? We must decide **WAT
 Presenting to you WatClassroom, an app where user inputs the required date and time, gets nearest empty classrooms which classrooms just got empty or are about to get empty. 
 Can filter out the unnecessary buildings. 
 Uses UWaterloo OpenDataAPI
+
+## API Documentation
+https://openapi.data.uwaterloo.ca/api-docs/index.html
