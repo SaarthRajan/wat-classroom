@@ -13,10 +13,6 @@ app = FastAPI()
 async def root():
     return {"message": "Hello World"}
 
-@app.get("/locations/{location}")
-async def get_nearest_location(location: str):
-    return location
-
 @app.get("/find_nearest_locations/{building_code}")
 async def find_nearest_locations(building_code):
 
