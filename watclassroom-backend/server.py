@@ -44,9 +44,9 @@ async def find_nearest_locations(building_code):
     
     for entry in loc_json:
         loc = entry["latitude"], entry["longitude"]
-        distances[entry["buildingCode"]] = f"{GD(loc,cur_loc).m} m"
+        distances[entry["buildingCode"]] = f"{GD(loc,cur_loc).m}"
 
-    sorted_dict = dict(sorted(distances.items(), key=lambda item: item[1]))
+    sorted_dict = dict(sorted(distances.items(), key=lambda item: float(item[1])))
 
     return sorted_dict
 
