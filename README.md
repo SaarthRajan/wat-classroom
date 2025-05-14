@@ -12,3 +12,8 @@ Uses UWaterloo OpenDataAPI
 
 ## API Documentation
 https://openapi.data.uwaterloo.ca/api-docs/index.html
+
+## Note
+Please read the below before use. 
+
+https://uwaterloo.ca/secretariat/policies-procedures-guidelines/policies/policy-46-information-management
