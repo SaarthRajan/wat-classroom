@@ -129,22 +129,26 @@ def get_empty_classes():
         for room in rooms:
             room_number = room.get("roomNumber")
             schedule = room.get("Schedule", [])
-            
+
             data[building_code][f"{building_code}{room_number}"] = []
 
             for slot in (schedule[0]).get("Slots", []):
                 start = slot.get("StartTime")
                 end = slot.get("EndTime")
                 (data[building_code][f"{building_code}{room_number}"]).append([f"{start}", f"{end}"])
+
+    return data
         
-    return [datetime.now().strftime("%H:%M:%S"), data] 
+    # return [datetime.now().strftime("%H:%M:%S"), data] 
     # debug purpose - returns an array with current time and list of open classroom slots divided by buildings
     # this will be changed later based on the use case
 
+"""
+sort_by_dist(buildingCode) takes buildingCode and sorts slots based on the nearest location
+"""
+def sort_by_dist(buildingCode):
 
-
-
-
+    return {}
     
 
 @app.get("/")

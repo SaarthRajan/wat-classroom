@@ -1,0 +1,34 @@
+# Load Location Data - Run when updating
+
+from dotenv import load_dotenv
+import requests
+import os
+import json
+
+load_dotenv()
+uwaterloo_api = os.getenv("UWATERLOO_API_KEY")
+base_uwaterloo_url = "https://openapi.data.uwaterloo.ca/v3"
+
+def get_all_locations():
+    url = base_uwaterloo_url + "/Locations"
+    headers = {
+        'x-api-key': uwaterloo_api,
+        'accept': 'application/json'
+    }
+    response = requests.get(url, headers=headers)
+    response_json = response.json()
+    building_list = {}
+    for entry in response_json:
+        if entry["latitude"]:
+            building_list[entry["buildingCode"]] = {
+                "name": entry["buildingName"],
+                "latitude": entry["latitude"],
+                "longitude": entry["longitude"]
+            }
+    return building_list
+
+if __name__ == "__main__":
+    data = get_all_locations()
+    with open('buildings.json', 'w') as f:
+        json.dump(data, f, indent=4)
+    print("Location data saved to buildings.json")
