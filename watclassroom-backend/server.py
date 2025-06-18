@@ -19,38 +19,6 @@ get_open_classroom_url = "https://portalapi2.uwaterloo.ca/v2/map/OpenClassrooms"
 app = FastAPI()
 
 """
-get_all_locations() returns uwaterloo building locations (which are available). 
-Return Format:
-    {
-        "buildingCode": {
-            "name": "buildingName",
-            "latitude": XXXXX,
-            "longitude": XXXXX
-        }
-    }
-Side Effects: calls UWaterloo API
-"""
-def get_all_locations():
-    url = base_uwaterloo_url + "/Locations"
-    payload = {}
-    headers = {
-    'x-api-key': uwaterloo_api,
-    'accept': 'application/json'
-    }
-    response = requests.request("GET", url, headers=headers, data=payload)
-    building_list = {}
-    response_json = response.json()
-
-    for entry in response_json:
-        if (entry["latitude"]):
-            building_list[entry["buildingCode"]] = {
-                "name": entry["buildingName"],
-                "latitude": entry["latitude"],
-                "longitude": entry["longitude"]
-            }
-    return building_list
-
-"""
 get_buildings_with_open_classrooms() returns the data of buildings that support empty classrooms. 
 Format:
     {
@@ -141,7 +109,6 @@ def get_empty_classes():
         
     # return [datetime.now().strftime("%H:%M:%S"), data] 
     # debug purpose - returns an array with current time and list of open classroom slots divided by buildings
-    # this will be changed later based on the use case
 
 """
 sort_by_dist(buildingCode) takes buildingCode and sorts slots based on the nearest location
@@ -153,7 +120,6 @@ def sort_by_dist(buildingCode):
 
 @app.get("/")
 async def root():
-    # return get_all_locations()
     # return get_buildings_with_open_classrooms()
     return get_empty_classes()
 

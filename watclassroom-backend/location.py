@@ -1,4 +1,4 @@
-# Load Location Data - Run when updating
+# Create and Load Location Data - Run to update building data
 
 from dotenv import load_dotenv
 import requests
@@ -9,6 +9,19 @@ load_dotenv()
 uwaterloo_api = os.getenv("UWATERLOO_API_KEY")
 base_uwaterloo_url = "https://openapi.data.uwaterloo.ca/v3"
 
+
+"""
+get_all_locations() returns uwaterloo building locations (which are available). 
+Return Format:
+    {
+        "buildingCode": {
+            "name": "buildingName",
+            "latitude": XXXXX,
+            "longitude": XXXXX
+        }
+    }
+Side Effects: calls UWaterloo API
+"""
 def get_all_locations():
     url = base_uwaterloo_url + "/Locations"
     headers = {
