@@ -1,4 +1,7 @@
-# Wat Classroom
+
+<div style="text-align: center;">
+<img src="watclassroom-ui/assets/images/watclassroom-logo.png" width=200/>
+</div>
 
 ## Problem
 Different people study best in different places. For some, it may be the comfort of the apartment, for others it might be the silence of the libraries. But for me and my friends, it is the empty classrooms. It is not too difficult to get a classroom, but in exam season, classrooms always seem full. 
