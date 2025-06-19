@@ -10,7 +10,11 @@ module.exports = {
         element: "#393E46",
         default: "#EEEEEE",
         heading: "#00ADB5"
-      }
+      },
+      fontFamily: {
+        heading: ['"Comic Sans MS"', 'cursive', 'sans-serif'],
+        rest: ['Arial', 'sans-serif']
+      },
     },
   },
   plugins: [],
