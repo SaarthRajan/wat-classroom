@@ -6,6 +6,8 @@ import os
 from geopy.distance import geodesic as GD
 import json
 from datetime import datetime
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 # get api key
 load_dotenv()
@@ -17,6 +19,14 @@ get_open_classroom_url = "https://portalapi2.uwaterloo.ca/v2/map/OpenClassrooms"
 
 # fastapi app
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # allow all origins, including your Expo URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 """
 get_buildings_with_open_classrooms() returns the data of buildings that support empty classrooms. 
@@ -123,3 +133,10 @@ async def root():
     # return get_buildings_with_open_classrooms()
     return get_empty_classes()
 
+
+
+@app.get("/all_buildings")
+async def get_all_buildings():
+    with open('buildings.json', 'r') as f:
+        buildings = json.load(f)
+    return JSONResponse(content=buildings)
