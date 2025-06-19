@@ -133,10 +133,12 @@ async def root():
     # return get_buildings_with_open_classrooms()
     return get_empty_classes()
 
-
-
 @app.get("/all_buildings")
 async def get_all_buildings():
     with open('buildings.json', 'r') as f:
         buildings = json.load(f)
     return JSONResponse(content=buildings)
+
+@app.get("/result")
+async def result():
+    return get_empty_classes()
