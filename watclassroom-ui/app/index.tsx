@@ -73,11 +73,17 @@ function Index() {
     setOpen(false);
     setLoading(true);
     axios
-      .get<ResultData>("http://localhost:8000/result")
+      .get<ResultData>(`http://localhost:8000/result/${value}`)
       .then((response) => {
         setLoading(false);
         // Show all buildings from the response, no filtering
         setResultData(response.data);
+
+        const expandedState: Record<string, boolean> = {};
+        Object.keys(response.data).forEach((buildingCode) => {
+          expandedState[buildingCode] = false; // or true to expand all
+        });
+        setExpandedBuildings(expandedState);
       })
       .catch((error) => {
         setLoading(false);

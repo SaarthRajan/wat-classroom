@@ -1,11 +1,11 @@
-# import modules required
+# import modules reqd.
 from fastapi import FastAPI
 from dotenv import load_dotenv
 import requests
 import os
 from geopy.distance import geodesic as GD
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -20,6 +20,7 @@ get_open_classroom_url = "https://portalapi2.uwaterloo.ca/v2/map/OpenClassrooms"
 # fastapi app
 app = FastAPI()
 
+# to allow communicate with fronted in local
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # allow all origins, including your Expo URL
@@ -30,18 +31,18 @@ app.add_middleware(
 
 """
 get_buildings_with_open_classrooms() returns the data of buildings that support empty classrooms. 
+
 Format:
     {
         "buildingCode": {
             "name": "buildingName",
-            "latitude": XXXXX,
-            "longitude": XXXXX,
             "slots": "open classroom slots info"
         }
     }
+
 Side Effects: Calls Portal API
 """
-def get_buildings_with_open_classrooms():
+def get_buildings_with_open_classrooms() -> dict:
     payload = {}
     headers = {}
     response = requests.request("GET", get_open_classroom_url, headers=headers, data=payload)  
@@ -64,16 +65,17 @@ def get_buildings_with_open_classrooms():
                     props["openClassroomSlots"] = json.loads(props["openClassroomSlots"])
                 except json.JSONDecodeError:
                     props["openClassroomSlots"] = None
+        
             building_data[building_code] = {
                 "name": building_name,
-                "latitude": feature["geometry"]["coordinates"][1],
-                "longitude": feature["geometry"]["coordinates"][0],
                 "slots": props["openClassroomSlots"]
             }
+
     return building_data
 
 """
 get_empty_classes() returns a dictionary of open class slots divided buildings
+
 Format: 
     {
         "buildingCode": {
@@ -88,7 +90,7 @@ Format:
 
 Side Effects: Calls external functions which may call an API
 """
-def get_empty_classes():
+def get_empty_classes() -> dict:
     building_data = get_buildings_with_open_classrooms()
     data = {}
 
@@ -116,29 +118,128 @@ def get_empty_classes():
                 (data[building_code][f"{building_code}{room_number}"]).append([f"{start}", f"{end}"])
 
     return data
-        
-    # return [datetime.now().strftime("%H:%M:%S"), data] 
-    # debug purpose - returns an array with current time and list of open classroom slots divided by buildings
 
 """
-sort_by_dist(buildingCode) takes buildingCode and sorts slots based on the nearest location
+sort_by_dist(buildingCode) takes building_code and empty_class_data 
+and sorts slots based on the nearest location
+
+Format: 
+    {
+        "buildingCode": {
+            "roomNumber": [
+                [
+                    "startTime", 
+                    "endTime"
+                ]
+            ]
+        }
+    }
+
+Side Effects: None
 """
-def sort_by_dist(buildingCode):
+def sort_by_dist(building_code: str, empty_class_data: dict) -> dict:
 
-    return {}
-    
+    with open('buildings.json', 'r') as f:
+        buildings = json.load(f)
 
-@app.get("/")
-async def root():
-    # return get_buildings_with_open_classrooms()
-    return get_empty_classes()
+    if building_code not in buildings:
+        raise ValueError(f"Building code '{building_code}' not found in location data.")
 
+    cur_loc = (buildings[building_code]["latitude"], buildings[building_code]["longitude"])
+    distances = {}
+
+    for code in empty_class_data:
+        if code not in buildings:
+            continue
+
+        loc = (buildings[code]["latitude"], buildings[code]["longitude"])
+        dist_m = GD(cur_loc, loc).meters
+        distances[code] = dist_m
+
+    # Sort by distance ascending
+    sorted_buildings = sorted(distances.items(), key=lambda item: item[1])
+
+    sorted_empty_classes = {}
+    for code, dist in sorted_buildings:
+        sorted_empty_classes[code] = empty_class_data[code]
+
+    return sorted_empty_classes
+
+"""
+filter_by_time(empty_class_data) takes empty_class_data and filters 
+out all the slots that are not ongoing or wont start within one hour 
+of current time. Removes all the slots that are empty and buildings
+that don't have any slots. 
+
+Format: 
+    {
+        "buildingCode": {
+            "roomNumber": [
+                [
+                    "startTime", 
+                    "endTime"
+                ]
+            ]
+        }
+    }
+
+Side Effects: None
+"""
+def filter_by_time(empty_class_data: dict) -> dict:
+    cur_dt = datetime.now()
+    cutoff_dt = cur_dt + timedelta(hours=1)
+
+    filtered_data = {}
+
+    for building_code, rooms in empty_class_data.items():
+        filtered_rooms = {}
+
+        for room_code, slots in rooms.items():
+            filtered_slots = []
+
+            for start_str, end_str in slots:
+                slot_start_dt = datetime.strptime(start_str, "%H:%M:%S").replace(
+                    year=cur_dt.year, month=cur_dt.month, day=cur_dt.day)
+                slot_end_dt = datetime.strptime(end_str, "%H:%M:%S").replace(
+                    year=cur_dt.year, month=cur_dt.month, day=cur_dt.day)
+
+                # Condition: slot is currently open OR starts within the next hours_ahead
+                if (slot_start_dt <= cur_dt <= slot_end_dt) or (cur_dt <= slot_start_dt <= cutoff_dt):
+                    filtered_slots.append([start_str, end_str])
+
+            if filtered_slots:
+                filtered_rooms[room_code] = filtered_slots
+
+        if filtered_rooms:
+            filtered_data[building_code] = filtered_rooms
+
+    return filtered_data
+
+"""
+    GET /all_buildings
+
+    Returns building info from local JSON for location dropdown.
+
+    Returns:
+        JSONResponse: JSON dictionary of buildings with their info.
+"""
 @app.get("/all_buildings")
 async def get_all_buildings():
     with open('buildings.json', 'r') as f:
         buildings = json.load(f)
     return JSONResponse(content=buildings)
 
-@app.get("/result")
-async def result():
-    return get_empty_classes()
+"""
+    GET /result/{buildingCode}
+
+    Returns result of sorted and filtered open classrooms displayed 
+    in scrollview
+
+    Returns:
+        JSONResponse: JSON dictionary of buildings with their info.
+"""
+@app.get("/result/{buildingCode}")
+async def result(buildingCode):
+    classes = get_empty_classes()
+    by_dist = sort_by_dist(buildingCode, classes)
+    return filter_by_time(by_dist)

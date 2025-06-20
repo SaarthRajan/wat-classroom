@@ -11,7 +11,8 @@ base_uwaterloo_url = "https://openapi.data.uwaterloo.ca/v3"
 
 
 """
-get_all_locations() returns uwaterloo building locations (which are available). 
+get_all_locations() returns uwaterloo building locations (which are available with api). 
+
 Return Format:
     {
         "buildingCode": {
@@ -20,9 +21,10 @@ Return Format:
             "longitude": XXXXX
         }
     }
+
 Side Effects: calls UWaterloo API
 """
-def get_all_locations():
+def get_all_locations() -> dict:
     url = base_uwaterloo_url + "/Locations"
     headers = {
         'x-api-key': uwaterloo_api,
@@ -40,6 +42,7 @@ def get_all_locations():
             }
     return building_list
 
+# Update the buildings.json file
 if __name__ == "__main__":
     data = get_all_locations()
     with open('buildings.json', 'w') as f:
