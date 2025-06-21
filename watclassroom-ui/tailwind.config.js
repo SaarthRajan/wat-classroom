@@ -6,14 +6,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        back: "#222831",
-        element: "#393E46",
-        default: "#EEEEEE",
-        heading: "#00ADB5"
+        back: "#000000",
+        element: "#787878",
+        default: "#FFFFFF",
+        heading: "#EAAB00"
       },
       fontFamily: {
-        heading: ['"Comic Sans MS"', 'cursive', 'sans-serif'],
-        rest: ['Arial', 'sans-serif']
+        heading: ['"Roboto Condensed"', '"HelveticaNeue-CondensedBold"', '"sans-serif-condensed"', 'sans-serif'],
+        body: ['Georgia', 'serif'],
+        ui: ['Verdana', 'sans-serif'],
       },
     },
   },

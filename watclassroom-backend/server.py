@@ -243,3 +243,6 @@ async def result(buildingCode):
     classes = get_empty_classes()
     by_dist = sort_by_dist(buildingCode, classes)
     return filter_by_time(by_dist)
+
+    # return get_empty_classes() # for testing purposes
+

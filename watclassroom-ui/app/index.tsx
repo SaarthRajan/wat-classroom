@@ -12,10 +12,10 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const headingFont = Platform.select({
-  ios: "Chalkboard SE",
-  android: "Comic Sans MS",
-  web: "Comic Sans MS",
-  default: "System",
+  ios: "HelveticaNeue-CondensedBold",
+  android: "sans-serif-condensed",
+  web: "'Roboto Condensed', Impact, sans-serif",
+  default: "Impact, sans-serif",
 });
 
 type BuildingItem = {
@@ -76,12 +76,12 @@ function Index() {
       .get<ResultData>(`http://localhost:8000/result/${value}`)
       .then((response) => {
         setLoading(false);
-        // Show all buildings from the response, no filtering
+
         setResultData(response.data);
 
         const expandedState: Record<string, boolean> = {};
         Object.keys(response.data).forEach((buildingCode) => {
-          expandedState[buildingCode] = false; // or true to expand all
+          expandedState[buildingCode] = false; // collapse
         });
         setExpandedBuildings(expandedState);
       })
@@ -101,40 +101,52 @@ function Index() {
         >
           WatClassroom
         </Text>
-        <Text className="text-xl text-center text-default mb-10 font-rest">
+        <Text className="text-xl text-center text-default mb-10 font-body">
           Find empty classrooms near you!
         </Text>
         <StatusBar hidden />
-        <Text className="text-xl text-default mb-3 font-rest">
+        <Text className="text-xl text-default mb-3 font-body">
           Choose your current location
         </Text>
 
         <View
-          className="flex-row items-center space-x-4 font-rest"
+          className="flex-row items-center space-x-4 font-body"
           style={{ zIndex: open ? 1000 : 0 }}
         >
           <View className="flex-1">
             <DropDownPicker
               open={open}
               value={value}
+              style={{
+                backgroundColor: "#000000",
+                borderColor: "#ffffff",
+              }}
               items={items}
               setOpen={setOpen}
               setValue={setValue}
               setItems={setItems}
               dropDownContainerStyle={{
                 padding: 10,
-                backgroundColor: "#ffffff",
+                backgroundColor: "#000000",
                 borderRadius: 8,
                 ...(Platform.OS === "web"
                   ? { boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)" }
                   : {}),
               }}
               textStyle={{
-                fontFamily: "Arial, serif",
+                fontFamily: "Georgia, serif",
                 fontSize: 16,
+                color: "#ffffff"
               }}
               searchable={true}
               searchPlaceholder="Enter Building Name..."
+              searchTextInputStyle={{
+                color: "#ffffff",
+                fontFamily: "Georgia, serif",
+                fontSize: 16,
+                backgroundColor: "#333333",
+              }}
+              arrowIconStyle={{ tintColor: "#ffffff" } as any}
             />
           </View>
 
@@ -144,8 +156,7 @@ function Index() {
             className={`p-4 rounded-md ${value ? "bg-heading" : "bg-element"}`}
           >
             <Text
-              className="text-white text-center text-base"
-              style={{ fontFamily: headingFont }}
+              className="text-white text-center text-base font-heading"
             >
               Submit
             </Text>
@@ -154,9 +165,15 @@ function Index() {
 
         <ScrollView className="mt-4 bg-back px-2">
           {!resultData && (
-            <Text className="text-center text-default mt-4">
+            <Text className="text-center text-default font-ui mt-4">
               Select a building and press Submit to see available rooms and
               times.
+            </Text>
+          )}
+
+          {resultData && Object.keys(resultData).length === 0 && (
+            <Text className="text-center text-default font-ui mt-4">
+              No results to display.
             </Text>
           )}
 
@@ -164,18 +181,22 @@ function Index() {
             Object.entries(resultData).map(([buildingCode, rooms]) => (
               <View
                 key={buildingCode}
-                className="mb-5 bg-heading"
+                className="mb-5 bg-heading rounded-xl border-4 border-element"
               >
                 {/* Building header */}
                 <TouchableOpacity
                   onPress={() => toggleBuilding(buildingCode)}
-                  className={`p-4 flex-row justify-between items-center ${
+                  className={`p-4 flex-row justify-between items-center rounded-t-lg rounded-b-lg ${
                     expandedBuildings[buildingCode]
                       ? "bg-heading"
-                      : "bg-element"
+                      : "bg-back"
                   }`}
                 >
-                  <Text className="text-2xl font-heading font-bold text-default">
+                  <Text className={`text-2xl font-heading font-bold ${
+                    expandedBuildings[buildingCode]
+                      ? "text-back"
+                      : "text-default"
+                  }`}>
                     {buildingCode}
                   </Text>
                   <Text className="text-xl text-default">
@@ -188,7 +209,7 @@ function Index() {
                   <View className="pl-6 pb-4">
                     {Object.entries(rooms).map(([roomCode, times]) => (
                       <View key={roomCode} className="mb-2">
-                        <Text className="text-lg font-semibold text-element">
+                        <Text className="text-lg font-semibold text-default">
                           {roomCode}
                         </Text>
                         {times.map(([start, end], i) => (
