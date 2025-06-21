@@ -21,8 +21,8 @@ from geopy.distance import geodesic as GD
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-# For testing in local - update CORS Policy - Uncomment for development
-# from fastapi.middleware.cors import CORSMiddleware
+# for updating CORS Policy
+from fastapi.middleware.cors import CORSMiddleware
 
 # Model Validation
 from pydantic import BaseModel, RootModel
@@ -54,6 +54,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # fastapi app
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://watclassroom.vercel.app",  # <-- Replace with your actual deployed frontend URL
+    ],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 
 # REMOVE IN PROD. - This is VERY unsecure
