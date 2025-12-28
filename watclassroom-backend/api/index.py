@@ -58,7 +58,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://watclassroom.vercel.app",
+        # "https://watclassroom.vercel.app",
         "https://watclassroom.saarthrajan.com"
     ],
     allow_methods=["*"],
