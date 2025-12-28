@@ -432,6 +432,11 @@ function Index() {
             />
           )}
         </ScrollView>
+        <View className="items-center py-4">
+          <Text className="bg-[#cccccc] text-black px-4 py-2 rounded-3xl font-body">
+            Made with ❤️ by Saarth
+          </Text>
+        </View>
       </View>
     </SafeAreaView>
   );
