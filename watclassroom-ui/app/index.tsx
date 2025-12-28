@@ -163,6 +163,12 @@ function LoadingIndicator() {
   );
 }
 
+// To check if it is the weekend
+const isWeekend = () => {
+  const day = new Date().getDay();
+  return day === 0 || day === 6; // 0 = Sunday, 6 = Saturday
+};
+
 /** Props for RoomTimesList component */
 type RoomTimesListProps = {
   rooms: {
@@ -269,6 +275,8 @@ function Index() {
   >({});
   // for user friendly error messsages
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // for weekend
+  const [isWeekendDay, setIsWeekendDay] = useState(false);
 
   /**
    * Toggles expand/collapse of building section to show/hide rooms
@@ -312,12 +320,24 @@ function Index() {
     fetchBuildings(); // Call the async function
   }, []);
 
+  useEffect(() => {
+    setIsWeekendDay(isWeekend());
+  }, []);
+
   /**
    * Fetches open classrooms for the selected building when user taps Submit.
    * Updates loading state and result data accordingly.
    */
   const handlePress = async () => {
     if (!value) return;
+
+    if (isWeekendDay) {
+      setResultData(null);
+      setErrorMessage(
+        "Data is not available on weekends. Please check back on weekdays."
+      );
+      return;
+    }
 
     setOpen(false);
     setLoading(true);
@@ -381,7 +401,7 @@ function Index() {
         />
 
         {/* Displays error messages if any (e.g., failed fetch) */}
-        
+
         <ErrorMessage message={errorMessage} />
         {/* Results section inside scrollable area */}
         <ScrollView className="mt-4 bg-back px-2">
