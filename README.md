@@ -9,9 +9,7 @@ Different people study best in different places. For some, it may be the comfort
 Is there a way to ensure that we always get an empty class? We must decide **WAT CLASSROOM**?. 
 
 ## Solution
-Presenting to you WatClassroom, an app where user inputs the required date and time, gets nearest empty classrooms which classrooms just got empty or are about to get empty. 
-Can filter out the unnecessary buildings. 
-Uses UWaterloo OpenDataAPI
+Presenting to you WatClassroom, an app where user inputs their location on campus, gets nearest empty classrooms which are currently empty. 
 
 ## API Documentation
 https://openapi.data.uwaterloo.ca/api-docs/index.html
