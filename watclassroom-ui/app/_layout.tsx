@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 import "../global.css";
 import React, { useEffect } from 'react';
-import { View, Text } from 'react-native';
+import { Analytics } from "@vercel/analytics/react";
 
 function RootLayout() {
   useEffect(() => {
@@ -9,6 +9,7 @@ function RootLayout() {
   }, []);
   return <>
   <Stack screenOptions={{ headerShown: false }} />
+  <Analytics />
   </>
   
 }
